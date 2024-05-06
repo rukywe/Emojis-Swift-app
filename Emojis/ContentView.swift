@@ -1,4 +1,5 @@
 import SwiftUI
+import SharedWithYou
 
 enum Emoji: String, CaseIterable, Identifiable {
     case poop = "💩"
@@ -23,6 +24,7 @@ enum Emoji: String, CaseIterable, Identifiable {
 struct ContentView: View {
     @State private var selection: Emoji = .rocket
     @AppStorage("isDarkMode") private var isDarkMode = false
+    @AppStorage("sharedEmoji") private var sharedEmoji: Emoji?
 
     var body: some View {
         NavigationView {
@@ -45,11 +47,26 @@ struct ContentView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .padding()
+
+                Button(action: {
+                    sharedEmoji = selection
+                    shareEmoji()
+                }) {
+                    Text("Share")
+                }
+                .padding()
             }
             .navigationTitle("Emoji Picker!")
             .padding()
         }
         .preferredColorScheme(isDarkMode ? .dark : .light)
+    }
+
+    func shareEmoji() {
+        let text = "\(selection.rawValue) - \(selection.description)"
+        let activityViewController = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        UIApplication.shared.keyWindow?.rootViewController?.present(activityViewController, animated: true) {}
     }
 }
 
